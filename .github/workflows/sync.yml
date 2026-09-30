@@ -1,0 +1,57 @@
+name: Sync CBSM and deploy
+
+on:
+  schedule:
+    - cron: "17 10 * * *"   # daily, ~5 AM Minnesota time
+  workflow_dispatch:         # "Run workflow" button for a manual sync
+  push:
+    branches: [main]
+    paths: ["site/index.html", "scraper/**", ".github/workflows/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: cbsm-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r scraper/requirements.txt
+
+      - name: Mirror the manual
+        run: python scraper/scrape.py --out site/data --delay 1.0
+
+      - name: Save changes to the repo
+        run: |
+          git config user.name "cbsm-sync"
+          git config user.email "actions@users.noreply.github.com"
+          git add site/data
+          git diff --cached --quiet || git commit -m "Sync CBSM $(date -u +%Y-%m-%d)"
+          git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: sync
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
