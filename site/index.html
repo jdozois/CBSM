@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CBSM</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F7F6; --panel:#FFFFFF; --ink:#18242A; --muted:#55646B; --line:#D5DDDA;
+  --lake:#123A4A; --pine:#2F5D50; --pine-soft:#E4EEEA; --sun:#F1C24B; --sun-soft:#FBEFC8; --focus:#1F6FB2;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--paper:#0F1A1E;--panel:#162429;--ink:#E6EEEC;--muted:#9BB0AE;--line:#2A3C42;--lake:#8EC5D6;--pine:#8CC2AE;--pine-soft:#1C3330;--sun:#E6B93F;--sun-soft:#3A3217;--focus:#7FB8F0}
+}
+:root[data-theme="dark"]{--paper:#0F1A1E;--panel:#162429;--ink:#E6EEEC;--muted:#9BB0AE;--line:#2A3C42;--lake:#8EC5D6;--pine:#8CC2AE;--pine-soft:#1C3330;--sun:#E6B93F;--sun-soft:#3A3217;--focus:#7FB8F0}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px)}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:17px/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--lake)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+mark{background:var(--sun-soft);color:inherit;border-radius:2px;box-shadow:0 0 0 2px var(--sun-soft)}
+
+.bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.bar-in{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;gap:16px;align-items:center}
+.logo{font-weight:700;font-size:22px;color:var(--lake);text-decoration:none;white-space:nowrap}
+.search{flex:1;position:relative}
+.search input{width:100%;font:inherit;font-size:18px;padding:11px 48px 11px 16px;border:2px solid var(--lake);border-radius:12px;background:var(--panel);color:var(--ink)}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:13px/1 inherit;border:1px solid var(--line);border-radius:6px;padding:4px 7px;color:var(--muted)}
+.bar nav a{color:var(--ink);text-decoration:none;font-size:16px;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover,.bar nav a[aria-current="page"]{background:var(--pine-soft)}
+.menu-btn{display:none;font:inherit;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--ink)}
+
+.shell{max-width:1240px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:40px}
+aside.toc{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 90px);overflow:auto;padding:20px 6px 40px 0;font-size:15px}
+aside.toc ul{list-style:none;margin:0;padding:0}
+aside.toc ul ul{padding-left:14px;border-left:1px solid var(--line);margin-left:9px}
+aside.toc li{margin:1px 0}
+aside.toc .item{display:flex;align-items:flex-start}
+aside.toc .tw{all:unset;cursor:pointer;width:18px;flex:none;text-align:center;color:var(--muted);line-height:1.9}
+aside.toc .tw:focus-visible{outline:2px solid var(--focus)}
+aside.toc a{flex:1;display:block;padding:3px 8px;border-radius:6px;text-decoration:none;color:var(--ink);line-height:1.4}
+aside.toc a:hover{background:var(--pine-soft)}
+aside.toc a[aria-current="page"]{background:var(--pine);color:var(--panel);font-weight:700}
+aside.toc li.closed>ul{display:none}
+
+main{padding:28px 0 80px;min-width:0}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:6px}
+.crumbs a{color:var(--muted)}
+h1.pt{font-size:clamp(28px,3.6vw,40px);line-height:1.12;margin:0 0 12px;color:var(--lake)}
+.pagemeta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:14px;color:var(--muted);padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.pagemeta a{color:var(--muted)}
+.pinbtn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.pinbtn[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft)}
+.doc{max-width:74ch}
+.doc h2{font-size:24px;margin:1.8em 0 .4em;color:var(--lake)}
+.doc h3{font-size:20px;margin:1.5em 0 .3em}
+.doc h4{font-size:17px;margin:1.3em 0 .2em}
+.doc p,.doc li{margin:.5em 0}
+.doc table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:1em 0;font-size:15px}
+.doc th,.doc td{border:1px solid var(--line);padding:7px 10px;vertical-align:top;text-align:left}
+.doc th{background:var(--pine-soft)}
+.doc a[target="_blank"]::after{content:" ↗";font-size:.8em}
+.outline{border-left:4px solid var(--pine);padding:4px 0 4px 16px;margin:0 0 28px;font-size:15px}
+.outline b{display:block;margin-bottom:4px}
+.outline a{display:block;text-decoration:none;padding:2px 0}
+
+.results{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.results li{border-bottom:1px solid var(--line);padding:14px 6px}
+.results li.active{background:var(--pine-soft)}
+.results a.t{font-weight:700;font-size:18px;text-decoration:none}
+.results a.t:hover{text-decoration:underline}
+.results .p{font-size:14px;color:var(--muted)}
+.results .s{font-size:15px;margin-top:4px;max-width:80ch}
+.decoder{margin:0 0 14px}
+.decoder span{display:inline-block;background:var(--sun-soft);border-left:4px solid var(--sun);padding:3px 10px;margin:0 8px 6px 0;border-radius:0 6px 6px 0}
+
+.waivers{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:2px solid var(--lake);border-radius:14px;overflow:hidden;margin:6px 0 34px;background:var(--panel)}
+.waivers a{display:block;padding:16px;text-decoration:none;color:var(--ink);border-right:1px solid var(--line)}
+.waivers a:last-child{border-right:0}
+.waivers a:hover{background:var(--pine-soft)}
+.waivers .ab{font-size:28px;font-weight:700;color:var(--pine);line-height:1}
+.waivers .nm{display:block;font-weight:700;margin:6px 0 4px;font-size:15px}
+.waivers .who{display:block;font-size:14px;color:var(--muted);line-height:1.4}
+h2.bh{font-size:20px;margin:0 0 10px}
+.plain{list-style:none;padding:0;margin:0 0 30px;border-top:1px solid var(--line)}
+.plain li{border-bottom:1px solid var(--line);padding:10px 4px}
+.plain a{font-weight:700;text-decoration:none}
+.muted{color:var(--muted)}
+.change h3{font-size:17px;margin:22px 0 6px}
+.change .k{display:inline-block;min-width:74px;font-size:14px;color:var(--muted)}
+.notice{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--sun);padding:12px 16px;border-radius:0 10px 10px 0;margin:0 0 24px;font-size:15px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-size:14px;color:var(--muted);max-width:74ch}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0}
+  aside.toc{display:none;position:fixed;inset:0;top:0;padding-top:calc(env(safe-area-inset-top,0px) + 130px) !important;z-index:10;max-height:none;background:var(--paper);padding:calc(env(safe-area-inset-top,0px) + 70px) 20px 40px}
+  body.menu-open aside.toc{display:block}
+  .menu-btn{display:inline-block;position:relative;z-index:11}
+  .bar nav,.search kbd,.kb{display:none}
+  .logo{font-size:18px}
+  .bar-in{flex-wrap:wrap;gap:10px 12px}
+  .search{order:3;flex-basis:100%}
+  .search input{font-size:17px}
+  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 130px)}
+  .waivers a{border-right:0;border-bottom:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="toc">Contents</button>
+    <a class="logo" href="#/">CBSM</a>
+    <div class="search">
+      <label for="q" style="position:absolute;left:-9999px">Search the whole manual</label>
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search every page — “CADI budget”, “reassessment”, “EVV”">
+      <kbd>/</kbd>
+    </div>
+    <nav aria-label="Site"><a href="#/changes" id="navChanges">What changed</a></nav>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" id="toc" aria-label="Table of contents"><p class="muted">Loading contents…</p></aside>
+  <main id="main" tabindex="-1"><p class="muted">Loading…</p></main>
+</div>
+
+<script>
+const ACRO={AASD:"Aging and Adult Services Division",DSD:"Disability Services Division",COR:"County of residence",CFR:"County of financial responsibility",DD:"Developmental disabilities",IAR:"Initial assessment review",LTCC:"Long-term care consultation",RSSC:"Residential support service criteria",AC:"Alternative Care",ECS:"Essential Community Supports",TCM:"Targeted case management","VA-DD":"Vulnerable adult / developmental disability",PAS:"Preadmission screening",OBRA:"Omnibus Budget Reconciliation Act",MA:"Medical Assistance","MA-EPD":"Medical Assistance for Employed Persons with Disabilities",EW:"Elderly Waiver",BI:"Brain Injury",CAC:"Community Alternative Care",CADI:"Community Access for Disability Inclusion",PCA:"Personal care assistance",CFSS:"Community First Services and Supports",HCN:"Home care nursing",HCBS:"Home and community-based services",EIDBI:"Early Intensive Developmental and Behavioral Intervention",EVV:"Electronic visit verification",SILS:"Semi-independent living services","ICF/DD":"Intermediate care facility for persons with developmental disabilities",LTSS:"Long-term services and supports",CSG:"Consumer Support Grant",FSG:"Family Support Grant",WMS:"Waiver Management System",CDCS:"Consumer-directed community supports",CSSP:"Coordinated service and support plan",MSHO:"Minnesota Senior Health Options",SNBC:"Special Needs BasicCare"};
+const WAIVERS=[["EW","Elderly Waiver","People 65 and older who need nursing-facility level of care","ID_000856"],["CADI","Community Access for Disability Inclusion","People under 65 with a disability who need nursing-facility level of care","ID_000855"],["DD","Developmental Disabilities","People with developmental disabilities or related conditions who need ICF/DD level of care","ID_000857"],["BI","Brain Injury","People with a brain injury who need nursing-facility or neurobehavioral hospital level of care","ID_000858"],["CAC","Community Alternative Care","People with chronic illness who need hospital level of care","ID_000854"]];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&");
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let pins=store.get("cbsm-pins",[]),recent=store.get("cbsm-recent",[]),openNodes=new Set(store.get("cbsm-open",[]));
+
+let TOC=[],META={},SEARCH=null,searchLoading=null,titles={},parents={};
+const pageCache=new Map();
+
+async function j(url){const r=await fetch(url,{cache:"no-cache"});if(!r.ok)throw new Error(r.status);return r.json()}
+
+// ---------- table of contents
+function indexToc(nodes,parent){for(const n of nodes){titles[n.id]=n.title;if(parent)parents[n.id]=parent;indexToc(n.children||[],n.id)}}
+function tocHtml(nodes){
+  return "<ul>"+nodes.map(n=>{
+    const kids=n.children&&n.children.length;
+    const open=openNodes.has(n.id);
+    return `<li class="${kids&&!open?"closed":""}" data-id="${n.id}"><div class="item">${kids?`<button class="tw" aria-expanded="${open}" aria-label="${open?"Collapse":"Expand"} ${esc(n.title)}">${open?"▾":"▸"}</button>`:`<span class="tw" aria-hidden="true"></span>`}<a href="#/page/${n.id}">${esc(n.title)}</a></div>${kids?tocHtml(n.children):""}</li>`}).join("")+"</ul>";
+}
+function renderToc(){$("#toc").innerHTML=tocHtml(TOC)}
+function markToc(id){
+  let p=parents[id];while(p){openNodes.add(p);p=parents[p]}store.set("cbsm-open",[...openNodes]);
+  renderToc();
+  const a=$(`#toc a[href="#/page/${CSS.escape(id)}"]`);
+  if(a){a.setAttribute("aria-current","page");a.scrollIntoView({block:"nearest"})}
+}
+$("#toc").addEventListener("click",e=>{
+  const b=e.target.closest(".tw");if(b&&b.tagName==="BUTTON"){const li=b.closest("li"),id=li.dataset.id;
+    openNodes.has(id)?openNodes.delete(id):openNodes.add(id);store.set("cbsm-open",[...openNodes]);
+    li.classList.toggle("closed");const o=!li.classList.contains("closed");b.textContent=o?"▾":"▸";b.setAttribute("aria-expanded",o);return}
+  if(e.target.closest("a"))closeMenu();
+});
+
+// ---------- search
+function loadSearch(){
+  if(!searchLoading)searchLoading=j("data/search.json").then(d=>{SEARCH=d.map(x=>({...x,tl:x.t.toLowerCase(),xl:x.x.toLowerCase(),pl:x.p.toLowerCase()}));return SEARCH});
+  return searchLoading;
+}
+function query(q){
+  const words=q.toLowerCase().split(/\s+/).filter(w=>w.length>0);
+  const groups=words.map(w=>{const a=ACRO[w.toUpperCase()];return a?[w,a.toLowerCase()]:[w]});
+  const phrase=words.length>1?q.toLowerCase().trim():null;
+  const out=[];
+  for(const d of SEARCH){
+    let score=0,ok=true;
+    for(const g of groups){
+      let best=0;
+      for(const t of g){
+        const rx=new RegExp("\\b"+reEsc(t),"g");
+        if(rx.test(d.tl))best=Math.max(best,30);
+        else if(d.pl.includes(t))best=Math.max(best,8);
+        const m=d.xl.match(rx);
+        if(m)best=Math.max(best,Math.min(20,4+m.length*2));
+      }
+      if(!best){ok=false;break}score+=best;
+    }
+    if(!ok)continue;
+    if(phrase&&d.xl.includes(phrase))score+=25;
+    if(phrase&&d.tl.includes(phrase))score+=40;
+    out.push({d,score});
+  }
+  return {results:out.sort((a,b)=>b.score-a.score).slice(0,80),terms:groups.flat()};
+}
+function snippet(d,terms){
+  let pos=-1;for(const t of terms){const i=d.xl.indexOf(t);if(i>=0&&(pos<0||i<pos))pos=i}
+  if(pos<0)return esc(d.x.slice(0,180))+(d.x.length>180?"…":"");
+  const start=Math.max(0,pos-70),s=(start?"…":"")+d.x.slice(start,start+230)+"…";
+  return hl(esc(s),terms);
+}
+function hl(html,terms){
+  terms.filter(t=>t.length>1).sort((a,b)=>b.length-a.length).forEach(t=>{html=html.replace(new RegExp("(?![^<]*>)\\b("+reEsc(esc(t))+")","ig"),"<mark>$1</mark>")});
+  return html;
+}
+let active=0;
+async function showSearch(q){
+  document.title=`“${q}” in CBSM`;
+  const main=$("#main");
+  if(!SEARCH){main.innerHTML=`<p class="muted">Loading the search index…</p>`;await loadSearch()}
+  if($("#q").value.trim()!==q && location.hash.startsWith("#/search"))return;
+  const {results,terms}=query(q);
+  const dec=[...new Set(q.split(/\s+/).map(w=>w.toUpperCase()).filter(w=>ACRO[w]))];
+  active=0;
+  main.innerHTML=`${dec.length?`<div class="decoder">${dec.map(a=>`<span><b>${esc(a)}</b> means ${esc(ACRO[a])}</span>`).join("")}</div>`:""}
+    <h1 class="pt">${results.length?`${results.length}${results.length===80?"+":""} page${results.length===1?" mentions":"s mention"} “${esc(q)}”`:`Nothing mentions “${esc(q)}”`}</h1>
+    ${results.length?`<p class="muted">Searching the full text of every page.<span class="kb"> ↑ ↓ to move, Enter to open.</span></p>
+    <ul class="results" id="results">${results.map((r,i)=>`<li class="${i===0?"active":""}"><a class="t" href="#/page/${r.d.id}?hl=${encodeURIComponent(q)}">${hl(esc(r.d.t),terms)}</a>${r.d.p?`<div class="p">${esc(r.d.p)}</div>`:""}<div class="s">${snippet(r.d,terms)}</div></li>`).join("")}</ul>`
+    :`<p>Try fewer words, a program name (CADI, EW, PCA), or a task such as “reassessment” or “appeal”.</p>`}`;
+}
+function moveActive(d){const rows=[...document.querySelectorAll("#results li")];if(!rows.length)return;
+  active=Math.max(0,Math.min(rows.length-1,active+d));rows.forEach((r,i)=>r.classList.toggle("active",i===active));rows[active].scrollIntoView({block:"nearest"})}
+
+// ---------- page view
+async function showPage(id,anchor,hlq){
+  const main=$("#main");
+  markToc(id);
+  let p=pageCache.get(id);
+  if(!p){
+    main.innerHTML=`<p class="muted">Loading…</p>`;
+    try{p=await j(`data/pages/${encodeURIComponent(id)}.json`);pageCache.set(id,p)}
+    catch(e){
+      const off="https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName="+encodeURIComponent(id);
+      main.innerHTML=`<h1 class="pt">This page isn't in the mirror</h1><p>It's probably in a different DHS manual or was added since the last sync. <a href="${off}" target="_blank" rel="noopener">Open it on the DHS site</a>.</p>`;return}
+  }
+  document.title=p.title+" — CBSM";
+  recent=[id,...recent.filter(x=>x!==id)].slice(0,15);store.set("cbsm-recent",recent);
+  const crumbs=(p.path||[]).map(t=>esc(t)).join(" › ");
+  const pinned=pins.includes(id);
+  let body=p.html;
+  if(hlq){const terms=hlq.toLowerCase().split(/\s+/).flatMap(w=>{const a=ACRO[w.toUpperCase()];return a?[w,a]:[w]});body=hl(body,terms)}
+  main.innerHTML=`${crumbs?`<div class="crumbs">${crumbs}</div>`:""}
+    <h1 class="pt">${esc(p.title)}</h1>
+    <div class="pagemeta">
+      ${p.dhsUpdated?`<span>DHS last updated ${esc(p.dhsUpdated)}</span>`:""}
+      <span>Synced ${fmtDate(p.synced)}</span>
+      <a href="${esc(p.official)}" target="_blank" rel="noopener">Official page</a>
+      <button class="pinbtn" id="pin" aria-pressed="${pinned}">${pinned?"★ Pinned":"☆ Pin"}</button>
+    </div>
+    <div id="outline"></div>
+    <article class="doc" id="doc">${body}</article>`;
+  const hs=[...document.querySelectorAll("#doc h2, #doc h3")];
+  if(hs.length>=3){
+    hs.forEach((h,i)=>{if(!h.id)h.id="s"+i});
+    $("#outline").innerHTML=`<nav class="outline" aria-label="On this page"><b>On this page</b>${hs.filter(h=>h.tagName==="H2").map(h=>`<a href="#/page/${id}/${h.id}">${esc(h.textContent)}</a>`).join("")||hs.map(h=>`<a href="#/page/${id}/${h.id}">${esc(h.textContent)}</a>`).join("")}</nav>`;
+  }
+  $("#pin").onclick=()=>{pins=pins.includes(id)?pins.filter(x=>x!==id):[id,...pins];store.set("cbsm-pins",pins);const on=pins.includes(id);$("#pin").setAttribute("aria-pressed",on);$("#pin").textContent=on?"★ Pinned":"☆ Pin"};
+  if(anchor){const t=document.getElementById(anchor)||document.querySelector(`[name="${CSS.escape(anchor)}"]`);if(t){t.scrollIntoView();return}}
+  const m=document.querySelector("#doc mark");
+  if(m)m.scrollIntoView({block:"center"});else window.scrollTo(0,0);
+}
+
+// ---------- home & changes
+function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}
+function listOf(ids){return `<ul class="plain">${ids.map(id=>`<li><a href="#/page/${id}">${esc(titles[id]||id)}</a></li>`).join("")}</ul>`}
+async function showHome(){
+  document.title="CBSM";
+  const pinned=pins.filter(id=>titles[id]),rec=recent.filter(id=>titles[id]&&!pins.includes(id)).slice(0,6);
+  let changes=[];try{changes=await j("data/changes.json")}catch(e){}
+  const last=changes[0];
+  $("#main").innerHTML=`
+    <h1 class="pt">Community-Based Services Manual</h1>
+    <p class="muted" style="margin-top:-4px">${META.pages||"All"} pages mirrored from Minnesota DHS, last synced ${fmtDate(META.synced)}. Press / to search every page.</p>
+    <h2 class="bh">Which waiver?</h2>
+    <div class="waivers">${WAIVERS.map(w=>`<a href="#/page/${w[3]}"><span class="ab">${w[0]}</span><span class="nm">${w[1]}</span><span class="who">${w[2]}</span></a>`).join("")}</div>
+    ${pinned.length?`<h2 class="bh">Pinned</h2>${listOf(pinned)}`:""}
+    ${rec.length?`<h2 class="bh">Recently read</h2>${listOf(rec)}`:""}
+    ${last?`<h2 class="bh">Latest changes, ${fmtDate(last.date)}</h2>${listOf([...last.added,...last.changed].slice(0,8).map(x=>x.id))}<p><a href="#/changes">See every change</a></p>`:""}
+    <footer>Unofficial mirror of the Minnesota DHS Community-Based Services Manual, re-synced daily. DHS's site is the authority on policy; each page links to its official version.</footer>`;
+}
+async function showChanges(){
+  document.title="What changed — CBSM";
+  let log=[];try{log=await j("data/changes.json")}catch(e){}
+  const item=(k,arr,link=true)=>arr.map(x=>`<div><span class="k">${k}</span>${link?`<a href="#/page/${x.id}">${esc(x.title)}</a>`:esc(x.title)}</div>`).join("");
+  $("#main").innerHTML=`<h1 class="pt">What changed</h1>
+    <p class="muted">Every daily sync compares each page's text with the day before. A page shows up here when DHS edits its content, adds it, or removes it.</p>
+    ${log.length?log.map(c=>`<section class="change"><h3>${fmtDate(c.date)}</h3>${item("Added",c.added)}${item("Edited",c.changed)}${item("Removed",c.removed,false)}</section>`).join("")
+    :`<div class="notice">No changes recorded yet. The log starts after the second sync.</div>`}`;
+}
+
+// ---------- router
+function route(){
+  closeMenu();
+  const h=location.hash.slice(1)||"/";
+  $("#navChanges").toggleAttribute("aria-current",h==="/changes");
+  if(h==="/changes")return showChanges();
+  let m=h.match(/^\/search\?q=(.*)$/);
+  if(m){const q=decodeURIComponent(m[1]);if($("#q").value!==q)$("#q").value=q;return showSearch(q)}
+  m=h.match(/^\/page\/([^/?]+)(?:\/([^?]+))?(?:\?hl=(.*))?$/);
+  if(m)return showPage(decodeURIComponent(m[1]),m[2]&&decodeURIComponent(m[2]),m[3]&&decodeURIComponent(m[3]));
+  $("#q").value="";markToc("");showHome();
+}
+let t;
+$("#q").addEventListener("input",()=>{clearTimeout(t);loadSearch();t=setTimeout(()=>{const q=$("#q").value.trim();
+  const target=q?"#/search?q="+encodeURIComponent(q):"#/";
+  if(location.hash.startsWith("#/search")&&q)history.replaceState(null,"",target),route();else location.hash=target},160)});
+$("#q").addEventListener("focus",loadSearch);
+$("#q").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();moveActive(1)}
+  if(e.key==="ArrowUp"){e.preventDefault();moveActive(-1)}
+  if(e.key==="Enter"){const a=document.querySelectorAll("#results li a.t")[active];if(a){location.hash=a.getAttribute("href");$("#q").blur()}}
+  if(e.key==="Escape"){$("#q").value="";location.hash="#/"}
+});
+document.addEventListener("keydown",e=>{if(e.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$("#q").focus();$("#q").select()}});
+function closeMenu(){document.body.classList.remove("menu-open");$("#menuBtn").setAttribute("aria-expanded","false")}
+$("#menuBtn").onclick=()=>{const o=document.body.classList.toggle("menu-open");$("#menuBtn").setAttribute("aria-expanded",o)};
+window.addEventListener("hashchange",route);
+
+(async()=>{
+  try{[TOC,META]=await Promise.all([j("data/toc.json"),j("data/meta.json")])}
+  catch(e){$("#main").innerHTML=`<h1 class="pt">No data yet</h1><p>Run the sync once (see the README) so there's something to show.</p>`;$("#toc").innerHTML="";return}
+  indexToc(TOC);
+  route();
+})();
+</script>
+</body>
+</html>
