@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup, Comment
 DHS = "https://www.dhs.state.mn.us"
 BASE = DHS + "/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName="
 START = "id_000402"  # CBSM home page
-UA = "CBSM-mirror/1.0 (unofficial daily sync; +https://github.com/)"
+UA = "Mozilla/5.0 (compatible; CBSM-mirror/1.1; unofficial once-a-day sync of the public CBSM)"
 
 ALLOWED_TAGS = {
     "p", "br", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "a", "strong", "b",
@@ -43,21 +43,35 @@ def norm_id(doc_id):
     return doc_id.strip().upper()
 
 
-def doc_id_from_href(href):
-    """Return the dDocName a DHS link points at, or None."""
+def raw_doc_id(href):
+    """Return the dDocName a DHS link points at, exactly as DHS wrote it, or None."""
     if not href:
         return None
     m = JS_LINK.match(href)
     if m:
-        return norm_id(m.group(1))
+        return m.group(1).strip()
     try:
         q = parse_qs(urlparse(href).query)
     except ValueError:
         return None
     for k, v in q.items():
         if k.lower() == "ddocname" and v:
-            return norm_id(v[0])
+            return v[0].strip()
     return None
+
+
+# normalized ID -> ID as DHS spells it (used when requesting the page)
+SOURCE_ID = {}
+
+
+def doc_id_from_href(href):
+    """Normalized (upper-case) ID for file names and links; remembers DHS's own spelling."""
+    raw = raw_doc_id(href)
+    if not raw:
+        return None
+    nid = norm_id(raw)
+    SOURCE_ID.setdefault(nid, raw)
+    return nid
 
 
 # ---------------------------------------------------------------- fetching
@@ -65,10 +79,16 @@ class Fetcher:
     def __init__(self, delay):
         self.delay = delay
         self.s = requests.Session()
-        self.s.headers["User-Agent"] = UA
+        self.s.headers.update({
+            "User-Agent": UA,
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.8",
+        })
         self.last = 0.0
+        self.why = {}
 
     def get(self, doc_id):
+        doc_id = SOURCE_ID.get(norm_id(doc_id), doc_id)
         for attempt in range(4):
             wait = self.delay - (time.time() - self.last)
             if wait > 0:
@@ -79,9 +99,11 @@ class Fetcher:
                 if r.status_code == 200:
                     r.encoding = r.apparent_encoding or "utf-8"
                     return r.text
+                self.why[norm_id(doc_id)] = f"HTTP {r.status_code} for {doc_id}"
                 if r.status_code == 404:
                     return None
             except requests.RequestException as e:
+                self.why[norm_id(doc_id)] = f"network error: {e}"[:200]
                 print(f"  ! {doc_id}: {e}", file=sys.stderr)
             time.sleep(5 * (attempt + 1))
         return None
@@ -126,7 +148,9 @@ def parse_toc(soup):
 
 
 def clean_content(soup, known_ids):
-    main = soup.find(id=re.compile("^mainContent$", re.I))
+    main = (soup.find(id=re.compile("^mainContent$", re.I))
+            or soup.find(attrs={"role": "main"})
+            or soup.find("main"))
     if main is None:
         return None, "", []
     main = BeautifulSoup(str(main), "html.parser")
@@ -226,7 +250,7 @@ def main():
     paths = {n["id"]: list(p) for n, p in flatten(toc)}
     queue = list(paths)
     known = set(queue)
-    pages, hashes, failed = {}, {}, []
+    pages, hashes, failed, reasons = {}, {}, [], {}
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     while queue and len(pages) < args.max_pages:
@@ -234,6 +258,7 @@ def main():
         html_raw = home if did == norm_id(START) else f.get(did)
         if not html_raw:
             failed.append(did)
+            reasons[did] = f.why.get(did, "no response")
             continue
         soup = BeautifulSoup(html_raw, "html.parser")
         if not is_cbsm(soup):
@@ -241,6 +266,8 @@ def main():
         content, title, links = clean_content(soup, known)
         if content is None:
             failed.append(did)
+            t = soup.title.get_text(" ", strip=True) if soup.title else "no <title>"
+            reasons[did] = f"no main text found (page title: {t[:80]}; {len(html_raw)} bytes)"
             continue
         title = title or re.sub(r"^CBSM\s*[-–]\s*", "", meta(soup, "dc.title")) or did
         page = {
@@ -258,9 +285,13 @@ def main():
                     known.add(l)
                     queue.append(l)
 
-    if len(pages) < 0.8 * max(len(old_hashes), 1):
-        sys.exit(f"Only {len(pages)} pages fetched vs {len(old_hashes)} last time; "
-                 "refusing to overwrite (DHS may be down).")
+    need = max(int(0.5 * len(paths)), int(0.8 * len(old_hashes)), 20)
+    if len(pages) < need:
+        print("First failures:", file=sys.stderr)
+        for k, v in list(reasons.items())[:15]:
+            print(f"  {k}: {v}", file=sys.stderr)
+        sys.exit(f"Only {len(pages)} pages fetched (need at least {need}); "
+                 "refusing to publish a mostly-empty mirror. See the failures listed above.")
 
     # Remove files for pages that disappeared
     for p in (out / "pages").glob("*.json"):
@@ -289,7 +320,7 @@ def main():
     (out / "search.json").write_text(json.dumps(search, ensure_ascii=False))
     (out / "changes.json").write_text(json.dumps(log, ensure_ascii=False, indent=1))
     (out / "meta.json").write_text(json.dumps({
-        "synced": now, "pages": len(pages), "failed": failed,
+        "synced": now, "pages": len(pages), "failed": failed, "failed_detail": reasons,
         "hashes": hashes, "titles": {k: v["title"] for k, v in pages.items()},
     }, ensure_ascii=False, indent=1))
     print(f"Done: {len(pages)} pages, {len(added)} added, {len(changed)} changed, "
