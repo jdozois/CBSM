@@ -1,47 +1,45 @@
-# CBSM mirror
+# CBSM guide
 
-This is a faster, searchable copy of Minnesota DHS's Community-Based Services Manual (CBSM). A scheduled job re-downloads every page each morning. It publishes the result as a website with full-text search, a table of contents you can collapse, pinned pages, and a "What changed" log.
+An unofficial quick-reference site for Minnesota DHS's Community-Based Services Manual (CBSM), built for waiver case managers. It's live at https://jdozois.github.io/CBSM/.
+
+## What the site has
+
+- **CBSM table of contents.** Links to all CBSM pages. They open the official DHS pages, because DHS's site blocks automated copying.
+- **Forms.** The DHS forms case managers complete, gather or give out, with what each is for and a link to the current version on eDocs. "All forms" adds DHS's frequently used forms list.
+- **Bulletins.** Ramsey County ADS Case Management Bulletins, collected daily.
+- **Search.** Covers CBSM page titles, forms and bulletins. Acronyms like CADI, EW and PCA are expanded.
+- **What changed.** New bulletins and revised forms, checked daily.
 
 ## What's in here
 
 ```
-scraper/scrape.py           downloads and cleans every CBSM page into JSON
-site/index.html             the website (one file, no build step)
-site/data/                  created by the scraper; the site reads from here
-.github/workflows/sync.yml  daily sync + deploy to GitHub Pages
-tests/test_parse.py         checks the HTML parsing against a sample page
+scraper/scrape.py            daily sync (link mode by default)
+scraper/cbsm_toc.json        the CBSM table of contents the site links to
+scraper/bulletins.py         collects Ramsey County ADS bulletins
+scraper/bulletins.txt        bulletin links to add by hand, one per line
+scraper/forms.py             builds the forms list and checks for revisions
+scraper/forms_catalog.json   case manager forms, with descriptions (edit freely)
+scraper/forms_dhs_list.txt   DHS's frequently used forms list
+scraper/forms.txt            extra form numbers to include, one per line
+scraper/requirements.txt     Python packages the sync needs
+site/index.html              the website
+site/data/                   written by the sync; the site reads from here
+.github/workflows/sync.yml   runs the sync daily and publishes the site
 ```
 
-## Set it up (about 10 minutes, free)
+## Day to day
 
-1. Create a new repository on GitHub. It can be public or private. Pages on private repos requires a paid plan or an organization account.
-2. Upload the contents of this folder to it, including the hidden `.github` folder. The easiest way is `git init`, `git add .`, `git commit`, then push. If you upload with drag-and-drop in the browser, make sure the `.github/workflows/sync.yml` file comes along.
-3. In the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-4. Go to **Actions → Sync CBSM and deploy → Run workflow**. The first run fetches every page one at a time with a pause between each, so expect roughly 5 to 15 minutes.
-5. When it finishes, your site is live at `https://<your-username>.github.io/<repo-name>/`.
+Nothing. The sync runs every morning at about 5 AM Central. To run it now, go to Actions, choose "Sync CBSM and deploy," and click "Run workflow."
 
-After that, it re-syncs every day at about 5 AM Central. You can also press **Run workflow** any time you want it fresh right away.
+## Common edits
 
-## Run it on your own computer
-
-```
-pip install -r scraper/requirements.txt
-python scraper/scrape.py --out site/data
-cd site && python -m http.server 8000
-```
-
-Then open http://localhost:8000.
-
-## How it behaves
-
-- **Full-text search.** Search covers every page's text, not just titles. Acronyms like CADI, EW, PCA, and EVV are expanded automatically, and matches are highlighted on the page you open.
-- **Links.** Links between CBSM pages stay inside the mirror. Links to statutes, bulletins, and forms open the original site.
-- **Page info.** Every page shows when DHS last updated it, when it was last synced, and a link to the official page.
-- **What changed.** This page lists which pages DHS added, edited, or removed on each day. The log starts after the second sync.
-- **Safety checks.** If DHS is down or its page layout changes, the scraper stops without overwriting anything. It refuses to save a run that finds far fewer pages than the last one. The site then keeps showing the previous day's copy, and the failed run appears in the Actions tab with a red ✕.
+- **Add a bulletin the sync missed:** open `scraper/bulletins.txt`, paste the bulletin's "View as a webpage" link on a new line, and commit.
+- **Add a form:** add its number (and optionally its title) on a new line in `scraper/forms.txt`.
+- **Change a form's description:** edit `scraper/forms_catalog.json`.
 
 ## Things to know
 
-- **This is unofficial.** DHS's site is the authority on policy. Keep the "Official page" link, and check it before acting on anything time-sensitive. The mirror can be up to a day behind.
-- **Be polite to DHS's servers.** The scraper waits one second between requests and runs once a day. Please don't lower the delay or run it every few minutes. It's also worth a quick read of DHS's website terms of use before sharing the site widely.
-- **If the scraper breaks.** It depends on DHS's current page structure: the `mainContent` and `divSidebar` areas and the `dDocName` links. If DHS redesigns its site, the scraper will fail safely, and `clean_content()` and `parse_toc()` in `scraper/scrape.py` are the two functions to adjust.
+- **This is unofficial.** DHS's site is the authority on policy. CBSM links always open the official pages.
+- **Policy page changes aren't tracked.** DHS's site shows a bot check (CAPTCHA) to automated requests, so the sync doesn't download CBSM pages. Subscribe to DHS's DSD eLists for manual updates.
+- **If GovDelivery or eDocs block automated requests too,** the sync still succeeds and the log says so; the site keeps the links.
+- **The Excel tracker** reads only `site/data/changes.json` (new bulletins and revised forms). Nothing from the tracker is ever sent here.
