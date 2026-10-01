@@ -20,6 +20,7 @@ from bs4 import BeautifulSoup
 HERE = Path(__file__).parent
 CATALOG = HERE / "forms_catalog.json"
 EXTRA = HERE / "forms.txt"
+DHS_LIST = HERE / "forms_dhs_list.txt"
 EDOCS = "https://edocs.dhs.state.mn.us/lfserver/{area}/{num}-ENG"
 EDOCS_LINK = re.compile(r"edocs\.dhs\.state\.mn\.us/lfserver/(?:(Public|Legacy|Secure|public|legacy|secure)/)?(DHS[-_ ]?\d{3,5}[A-Z]{0,2})-ENG", re.I)
 FORM_NUM = re.compile(r"\bDHS[-_ ]?(\d{3,5}[A-Z]{0,2})\b", re.I)
@@ -81,6 +82,21 @@ def extra_numbers():
     return out
 
 
+def dhs_list():
+    """DHS's frequently-used forms list: [(num, title, url)]."""
+    if not DHS_LIST.exists():
+        return []
+    out = []
+    for line in DHS_LIST.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        parts = [p.strip() for p in line.split("|")]
+        num = norm_num(parts[0])
+        if num:
+            out.append((num, parts[1] if len(parts) > 1 else "", parts[2] if len(parts) > 2 else ""))
+    return out
+
+
 def signature(headers):
     etag = headers.get("ETag") or headers.get("Etag") or ""
     lm = headers.get("Last-Modified") or ""
@@ -98,7 +114,7 @@ def check_versions(session, forms, old_sigs, delay, log):
     except Exception:
         rp.parse([])
     results = {}
-    checked = 0
+    checked = blocked = 0
     for f in forms:
         if f["area"] == "Secure" or f.get("custom_url"):
             continue  # needs a login, or isn't an eDocs file; link only
@@ -112,6 +128,16 @@ def check_versions(session, forms, old_sigs, delay, log):
             if resp.status_code in (403, 405, 501) or not signature(resp.headers)[0]:
                 resp = session.get(url, timeout=30, stream=True, allow_redirects=True)
                 resp.close()
+            ctype = (resp.headers.get("Content-Type") or "").lower()
+            if resp.status_code == 200 and "html" in ctype:
+                # an online form or a bot-check page; neither has a stable file version to compare
+                page = session.get(url, timeout=30, allow_redirects=True)
+                if re.search(r"captcha|radware", page.text[:5000], re.I):
+                    blocked += 1
+                    if blocked >= 3 and not results:
+                        log("  eDocs is showing a bot check to automated requests; showing links only.")
+                        return {}
+                continue
             if resp.status_code == 200:
                 sig, lm = signature(resp.headers)
                 if sig:
@@ -149,6 +175,17 @@ def sync(out, session, now, page_docs, delay=1.0, log=print, check=True):
                 "cm": c.get("cm", True), "area": "Public", "mentions": [], "order": i,
                 "custom_url": c.get("url", ""),
             }
+        for num, title, url in dhs_list():
+            f = forms.setdefault(num, {"num": num, "title": title, "category": "", "who": "", "programs": "",
+                                       "desc": "", "more": "", "related": [], "cm": False, "area": "Public",
+                                       "mentions": []})
+            f["title"] = f["title"] or title
+            if url and not f.get("custom_url"):
+                m = EDOCS_LINK.search(url)
+                if m and m.group(1):
+                    f["area"] = m.group(1).capitalize()
+                else:
+                    f["custom_url"] = url
         for num, e in links.items():
             f = forms.setdefault(num, {"num": num, "title": e["title"], "category": "", "who": "", "programs": "",
                                        "desc": "", "more": "", "related": [], "cm": False, "area": e["area"],

@@ -1,0 +1,112 @@
+# DHS's "frequently used forms" list from CBSM - Forms by number (ID_018176, updated 8/13/26).
+# These fill the site's "All forms" view. Format: number | title | link (only when not a normal eDocs PDF)
+DHS-0035 | State Agency Appeals Summary
+DHS-2638 | Day Training and Habilitation Service Agreement
+DHS-2807 | Civil Rights Complaint Form: Discrimination in Service Delivery
+DHS-2828C | Notice of Temporary Service Suspension
+DHS-2828D | Notice of Service Termination
+DHS-2868 | MHCP Hospice Transaction Form
+DHS-2981 | Medical Assistance (MA) Parental Fee Form
+DHS-2982 | County Parental Fee Referral to DHS
+DHS-3070 | Service Agreement
+DHS-3141 | Variance Request
+DHS-3426 | OBRA Level I Criteria – Screening for Developmental Disabilities or Mental Illness
+DHS-3427T | LTC Screening – Telephone Screening
+DHS-3428B | AC, EW, CADI & BI Waiver Case Mix Classification Worksheet
+DHS-3471 | BI Waiver Assessment and Eligibility Determination
+DHS-3471A | BI Waiver Assessment and Eligibility Determination Instructions
+DHS-3471B | BI Waiver Assessment and Eligibility Determination Checklist
+DHS-3543 | MHCP Request for Payment of Long-Term Care Services
+DHS-3547 | MA-EPD Initial Premium Notice | https://edocs.dhs.state.mn.us/lfserver/Legacy/DHS-3547-ENG
+DHS-3754 | Service Agreement and Screening Document (SASD) Support Team Portal | https://edocs.mn.gov/forms/DHS-3754-ENG
+DHS-3806 | EIDBI Authorization Request
+DHS-3806A | Instructions for MHCP: EIDBI Authorization Request form
+DHS-3848A | DSD Related Conditions Checklist - Instructions
+DHS-4007 | County of Financial Responsibility Transfer for FSG | https://edocs.dhs.state.mn.us/lfserver/Legacy/DHS-4007-ENG
+DHS-4015 | HCBS Provider Enrollment Application
+DHS-4016 | MHCP Individual Practitioner Provider Enrollment Application
+DHS-4016A | MHCP Organization - Provider Enrollment Application
+DHS-4022 | MHCP PCPO/PCA Choice Agency Enrollment Application
+DHS-4022A | MHCP Provider Agreement Addendum – PCPO
+DHS-4022B | MHCP Provider Agreement Addendum - PCA Choice Provider
+DHS-4022C | MHCP Qualified Professional (QP) Acknowledgement
+DHS-4071A | MA Home Care Nursing Assessment
+DHS-4071B | MA Home Care Nursing Assessment Instructions
+DHS-4071C | Home Care Nursing Service Decision Tree
+DHS-4074 | MA Home Care Technical Change Request
+DHS-4074A | PCA Technical Change Request
+DHS-4109 | HCN Hardship Waiver Application
+DHS-4138 | MHCP Provider Agreement
+DHS-4147A | Case Manager's Guide to Determining ICF/DD LOC for ICF/DD and DD Waiver
+DHS-4147B | Instructions for Case Managers Guide to Determining ICF/DD Level of Care for ICF/DD and DD Waiver Services
+DHS-4248 | OBRA Level II evaluative report for people with developmental disabilities or related conditions | https://survey.dhs.state.mn.us/Interview/951c6a71-fb79-4a8d-8062-0a80961f9f4b
+DHS-4248B | OBRA Level II evaluative report signature sheet
+DHS-4254 | Psychotropic Medication Use Checklist for 245B Licensed Programs | https://edocs.dhs.state.mn.us/lfserver/Legacy/DHS-4254-ENG
+DHS-4292 | PCA Request Form
+DHS-4315 | Authorization Request for Mobility Devices
+DHS-4625 | Instructions for Completing and Entering the LTC Screening Document and SA
+DHS-4669 | Instructions for Completing and Entering the LTCC Screening Document into MMIS for the MSHO and MSC+ Programs
+DHS-4677C | ICF/DD Local System Needs Plan Amendment
+DHS-4691 | PCA Time and Activity Documentation
+DHS-4960A | DT&H Services Determination of Need Application for Expansion
+DHS-4960B | DT&H Services Determination of Need Application for Proprietary Changes, Reductions and Closures
+DHS-5020A | Instructions for Completing and Entering the HRA for SNBC
+DHS-5148 | Behavior Intervention Reporting Form | https://edocs.dhs.state.mn.us/lfserver/Secure/DHS-5148-ENG
+DHS-5148A | Behavior Intervention Reporting Form Instructions
+DHS-5259 | MHCP Disclosure of Ownership and Control Interest of an Entity
+DHS-5504 | Requesting Medicaid Administrative Reimbursement or Reimbursement for AC
+DHS-5504C | Exception Request Checklist for Environmental Accessibility Adaptations that Exceed $40,000
+DHS-5788 | CDCS Alternative Treatment Form for MHCP-Enrolled Physicians | https://edocs.dhs.state.mn.us/lfserver/Legacy/DHS-5788-ENG
+DHS-5820A | Disability Waiver Rates System Exception Request Instructions
+DHS-5836 | Annual Review of Ward under Public Guardianship
+DHS-6000 | MHCP Designation of PCA Billing Person
+DHS-6005 | MHCP PCA Agency Applicant Assurance Statement
+DHS-6021 | Request to Develop New Corporate Foster Care (and Community Residential Settings)
+DHS-6021B | Voluntary Closure Application: Corporate Adult Foster Care Planned Closure
+DHS-6033 | MHCP PCA Agency Surety Bond
+DHS-6041 | MHCP PCA Agency Personnel List and Affiliation
+DHS-6383 | HCBS Waiver/AC Programs Lead Agency Provider Enrollment Request Form
+DHS-6633A | CDCS Community Support Plan Addendum with Provider Rate Increase
+DHS-6759G | Moving Home Minnesota Housing Transitions Worksheet
+DHS-6759H | Moving Home Minnesota Communications Form
+DHS-6759I | Moving Home Minnesota Informed Consent Form
+DHS-6759J | Moving Home Minnesota Transition Planning Tool
+DHS-6759K | Moving Home Minnesota Transition Planning Tool, Part 2: Risk Mitigation
+DHS-6768 | Case Manager's Cost Report for DD Full Team Screenings
+DHS-6791A | MnCHOICES Assessment Summary Worksheet
+DHS-6810 | Positive Support Transition Plan Template
+DHS-6810A | Positive Support Transition Plan Review
+DHS-6810B | Positive Support Transition Plan Instructions
+DHS-6810D | Request for the Authorization of the Emergency Use of Procedures
+DHS-6810F | Positive Supports Functional Behavior Assessment Quality Checklist
+DHS-6810G | Positive Support Transition Plan Quality Checklist
+DHS-6893A | CFSS Assessment
+DHS-6893B | Referral for Reassessment for PCA/CFSS Services
+DHS-6893C | CFSS Worker Time and Activity Documentation
+DHS-6893D | Recommendation for Removal from the CFSS Budget Model
+DHS-6893E | Home Care Shared Services Agreement (HCN, PCA or CFSS)
+DHS-6893F | PCA Program Responsible Party Form/CFSS Participant Representative Agreement
+DHS-6893G | CFSS Program Information and Signature Sheet
+DHS-6893H | CFSS Home Care Rating/Units Reference Tool
+DHS-6893I | CFSS Request Form | https://edocs.mn.gov/forms/DHS-6893I-ENG
+DHS-6893K | CFSS Technical Change Request | https://edocs.mn.gov/forms/DHS-6893K-ENG
+DHS-6893N | Consultation Services Provider CFSS Service Delivery Plan Cover Sheet
+DHS-6893R | CFSS Rights and Responsibilities
+DHS-6893S | CFSS Consultation Services Session Documentation
+DHS-6893T | Worker Information for CFSS Budget Model
+DHS-6910 | Rates Management (RMS) Residential Shared Staffing Hours Worksheet
+DHS-6939 | MA-EPD Good Cause Application | https://edocs.mn.gov/forms/DHS-6939-ENG
+DHS-6940 | MnCHOICES PCA Service Agreement Addendum
+DHS-6979 | MnCHOICES Help Desk Contact Form
+DHS-7108 | CMDE Medical Necessity Summary Information | https://edocs.dhs.state.mn.us/lfserver/Secure/DHS-7108-ENG
+DHS-7109 | Individual Treatment Plan (ITP) and Progress Monitoring | https://edocs.dhs.state.mn.us/lfserver/Secure/DHS-7109-ENG
+DHS-7109A | EIDBI Transition and/or Discharge Summary
+DHS-7109C | ITP and Progress Monitoring Week-in-the-Life Schedule (Addendum C)
+DHS-7176 | HCBS Provider Attestation | https://edocs.dhs.state.mn.us/lfserver/Secure/DHS-7176-ENG
+DHS-7209 | DSD DD Waiver Waiting List Category Determination Tool
+DHS-7279 | Olmstead Employment Practice Review Panel Story Template
+DHS-7634A | Maltreatment of Minors Mandated Reporting
+DHS-7759E | Safety Checklist for Out-of-Home Respite Services in an Unlicensed Setting
+DHS-8062 | Setting Capacity Report
+DHS-8168 | DSD Contact Form | https://edocs.mn.gov/forms/DHS-8168-ENG
+DHS-8477A | CFSS Information Sheet

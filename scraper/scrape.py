@@ -227,6 +227,64 @@ def flatten(toc, path=()):
         yield from flatten(n["children"], path + (n["title"],))
 
 
+def main_links(args):
+    """
+    Link mode: DHS's site shows a bot check (CAPTCHA) to automated requests, so nothing is
+    downloaded from it. The CBSM table of contents comes from cbsm_toc.json and links to the
+    official pages. Bulletins (GovDelivery) and forms (eDocs) are collected as usual.
+    """
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    old_meta = json.loads((out / "meta.json").read_text()) if (out / "meta.json").exists() else {}
+
+    toc = json.loads((Path(__file__).parent / "cbsm_toc.json").read_text(encoding="utf-8"))
+    # pages copied by the old mirror mode are no longer used
+    pages_dir = out / "pages"
+    if pages_dir.exists():
+        for p in pages_dir.glob("*.json"):
+            p.unlink()
+
+    s = requests.Session()
+    s.headers.update({"User-Agent": UA, "Accept": "text/html,application/xhtml+xml,application/rss+xml,*/*",
+                      "Accept-Language": "en-US,en;q=0.8"})
+
+    new_b, b_search, b_index = bulletins.sync(out, s.get, now, delay=args.delay)
+    first_bulletin_run = "bulletins" not in old_meta
+    b_titles = {b["id"]: b["title"] for b in b_index}
+
+    docs = []
+    for b in b_index:
+        bp = out / "bulletins" / f"{b['id']}.json"
+        if bp.exists():
+            docs.append(("B-" + b["id"], b["title"], json.loads(bp.read_text())["html"]))
+    revised_forms, f_search, f_list = forms.sync(out, s, now, docs, delay=args.delay)
+    f_titles = {x["num"]: x["title"] for x in f_list}
+
+    log = json.loads((out / "changes.json").read_text()) if (out / "changes.json").exists() else []
+    new_bulletins = [] if first_bulletin_run else new_b
+    if new_bulletins or revised_forms:
+        log.insert(0, {
+            "date": now,
+            "added": [{"id": "B-" + b, "title": b_titles.get(b, b)} for b in new_bulletins],
+            "changed": [{"id": "F-" + n, "title": f"{n} {f_titles.get(n, '')} (form revised)".replace("  ", " ")}
+                        for n in revised_forms],
+            "removed": [],
+        })
+        log = log[:200]
+
+    toc_search = [{"id": n["id"], "t": n["title"], "p": " › ".join(path), "x": ""} for n, path in flatten(toc)]
+    (out / "toc.json").write_text(json.dumps(toc, ensure_ascii=False))
+    (out / "search.json").write_text(json.dumps(toc_search + b_search + f_search, ensure_ascii=False))
+    (out / "changes.json").write_text(json.dumps(log, ensure_ascii=False, indent=1))
+    (out / "meta.json").write_text(json.dumps({
+        "mode": "links", "synced": now, "pages": len(toc_search),
+        "official_base": BASE, "bulletins": len(b_index), "forms": len(f_list),
+    }, ensure_ascii=False, indent=1))
+    print(f"Done: {len(toc_search)} CBSM links, {len(b_index)} bulletins ({len(new_b)} new), "
+          f"{len(f_list)} forms ({len(revised_forms)} revised).")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="site/data")
@@ -234,7 +292,11 @@ def main():
     ap.add_argument("--max-pages", type=int, default=1500)
     ap.add_argument("--follow-links", action="store_true", default=True,
                     help="also mirror CBSM pages linked from content but missing from the sidebar")
+    ap.add_argument("--mode", choices=["links", "mirror"], default="links",
+                    help="links (default): don't download DHS pages; mirror: copy them (only if DHS allows it)")
     args = ap.parse_args()
+    if args.mode == "links":
+        return main_links(args)
 
     out = Path(args.out)
     (out / "pages").mkdir(parents=True, exist_ok=True)

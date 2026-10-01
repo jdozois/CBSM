@@ -13,6 +13,7 @@ import json
 import re
 import time
 import xml.etree.ElementTree as ET
+from urllib import robotparser
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse
@@ -152,7 +153,9 @@ def clean_bulletin(html):
             continue
         el = node.parent
         # climb only while the wrapper holds little besides the footer text
-        while el.parent is not None and len(el.parent.get_text(" ", strip=True)) < 300:
+        # climb only while the wrapper adds almost nothing beyond the footer itself
+        while (el.parent is not None and el.parent.name not in ("body", "html", "[document]")
+               and len(el.parent.get_text(" ", strip=True)) - len(el.get_text(" ", strip=True)) < 40):
             el = el.parent
         for nxt in list(el.find_all_next()):
             try:
@@ -166,7 +169,8 @@ def clean_bulletin(html):
     # Drop the header bits already shown by the site
     for s in body.find_all(string=re.compile(r"View as a webpage|sent this bulletin at", re.I)):
         el = s.parent
-        while el is not None and el.parent is not None and len(el.parent.get_text(" ", strip=True)) < 120:
+        while (el is not None and el.parent is not None and el.parent.name not in ("body", "html", "[document]")
+               and len(el.parent.get_text(" ", strip=True)) - len(el.get_text(" ", strip=True)) < 40):
             el = el.parent
         if el is not None and len(el.get_text(" ", strip=True)) < 120:
             el.decompose()
@@ -220,7 +224,24 @@ def sync(out, session_get, now, delay=1.0, log=print):
     index = json.loads(index_path.read_text()) if index_path.exists() else []
     have = {b["id"] for b in index}
 
+    robots = {}
+
+    def allowed(url):
+        host = urlparse(url).netloc
+        if host not in robots:
+            rp = robotparser.RobotFileParser()
+            try:
+                r = session_get(f"https://{host}/robots.txt", timeout=30)
+                rp.parse(r.text.splitlines() if r.status_code == 200 else [])
+            except Exception:
+                rp.parse([])
+            robots[host] = rp
+        return robots[host].can_fetch("CBSM-mirror", url)
+
     def get_text(url):
+        if not allowed(url):
+            log(f"  {url} -> skipped (the site's robots.txt asks automated tools not to fetch it)")
+            return None
         try:
             time.sleep(delay)
             r = session_get(url, timeout=45)
