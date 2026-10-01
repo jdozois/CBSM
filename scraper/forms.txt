@@ -1,0 +1,5 @@
+# Extra DHS forms to show on your site's Forms page and check for revisions.
+# One per line: the form number, optionally followed by its title.
+# Forms linked anywhere in the CBSM or Ramsey bulletins are added automatically.
+# Example:
+# DHS-3543 Request for Payment of Long-Term Care Services

@@ -1,0 +1,4 @@
+# Ramsey County ADS Case Management Bulletin links.
+# The sync finds new bulletins on its own. If one ever goes missing from your site,
+# paste its "View as a webpage" link on a new line below and commit.
+https://content.govdelivery.com/accounts/MNRAMSEY/bulletins/4298066

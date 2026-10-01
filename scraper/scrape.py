@@ -23,6 +23,9 @@ from pathlib import Path
 from urllib.parse import urljoin, urlparse, parse_qs
 
 import requests
+
+import bulletins
+import forms
 from bs4 import BeautifulSoup, Comment
 
 DHS = "https://www.dhs.state.mn.us"
@@ -301,20 +304,39 @@ def main():
     added = sorted(set(hashes) - set(old_hashes))
     removed = sorted(set(old_hashes) - set(hashes))
     changed = sorted(k for k in hashes if k in old_hashes and hashes[k] != old_hashes[k])
+    # Ramsey County ADS bulletins (never allowed to break the CBSM sync)
+    new_b, b_search, b_index = bulletins.sync(out, f.s.get, now, delay=args.delay)
+    first_bulletin_run = "bulletins" not in old_meta
+    b_titles = {b["id"]: b["title"] for b in b_index}
+
+    # DHS forms from eDocs (links found in pages and bulletins, plus the curated catalog)
+    docs = [(k, v["title"], v["html"]) for k, v in pages.items()]
+    for b in b_index:
+        bp = out / "bulletins" / f"{b['id']}.json"
+        if bp.exists():
+            docs.append(("B-" + b["id"], b["title"], json.loads(bp.read_text())["html"]))
+    revised_forms, f_search, f_list = forms.sync(out, f.s, now, docs, delay=args.delay)
+    f_titles = {x["num"]: x["title"] for x in f_list}
+
     log = json.loads((out / "changes.json").read_text()) if (out / "changes.json").exists() else []
-    if old_hashes and (added or removed or changed):
+    page_changes = bool(old_hashes) and bool(added or removed or changed)
+    new_bulletins = [] if first_bulletin_run else new_b
+    if page_changes or new_bulletins or revised_forms:
         title_of = lambda k: pages[k]["title"] if k in pages else k
         old_titles = old_meta.get("titles", {})
         log.insert(0, {
             "date": now,
-            "added": [{"id": k, "title": title_of(k)} for k in added],
-            "changed": [{"id": k, "title": title_of(k)} for k in changed],
-            "removed": [{"id": k, "title": old_titles.get(k, k)} for k in removed],
+            "added": ([{"id": k, "title": title_of(k)} for k in added] if page_changes else []) +
+                     [{"id": "B-" + b, "title": b_titles.get(b, b)} for b in new_bulletins],
+            "changed": ([{"id": k, "title": title_of(k)} for k in changed] if page_changes else []) +
+                       [{"id": "F-" + n, "title": f"{n} {f_titles.get(n, '')} (form revised)".replace("  ", " ")}
+                        for n in revised_forms],
+            "removed": [{"id": k, "title": old_titles.get(k, k)} for k in removed] if page_changes else [],
         })
         log = log[:200]
 
     search = [{"id": k, "t": v["title"], "p": " › ".join(v["path"]), "x": text_of(v["html"])[:30000]}
-              for k, v in pages.items()]
+              for k, v in pages.items()] + b_search + f_search
 
     (out / "toc.json").write_text(json.dumps(toc, ensure_ascii=False))
     (out / "search.json").write_text(json.dumps(search, ensure_ascii=False))
@@ -322,9 +344,10 @@ def main():
     (out / "meta.json").write_text(json.dumps({
         "synced": now, "pages": len(pages), "failed": failed, "failed_detail": reasons,
         "hashes": hashes, "titles": {k: v["title"] for k, v in pages.items()},
+        "bulletins": len(b_index), "forms": len(f_list),
     }, ensure_ascii=False, indent=1))
     print(f"Done: {len(pages)} pages, {len(added)} added, {len(changed)} changed, "
-          f"{len(removed)} removed, {len(failed)} failed.")
+          f"{len(removed)} removed, {len(failed)} failed; {len(new_b)} new bulletins ({len(b_index)} total).")
 
 
 if __name__ == "__main__":

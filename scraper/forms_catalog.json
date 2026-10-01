@@ -1,0 +1,457 @@
+{
+  "_about": "Forms case managers complete, gather, or give to the person. Edit freely: change descriptions, add forms, or set \"cm\": false to hide one from the case manager view. 'more' is a CBSM page ID for background. Sources: CBSM Forms (ID_000688), CBSM Documents for LTSS assessment, eligibility and support planning (ID_002207), and Ramsey County ADS bulletins.",
+  "categories": [
+    "Reassessment referrals",
+    "Support planning",
+    "CFSS",
+    "Eligibility and financial",
+    "Notices and appeals",
+    "Budgets, rates and exceptions",
+    "Screening documents",
+    "Transfers",
+    "Home care",
+    "Give to the person"
+  ],
+  "forms": [
+    {
+      "num": "DHS-6791E",
+      "title": "MnCHOICES Reassessment Communication Form",
+      "category": "Reassessment referrals",
+      "who": "Case manager completes",
+      "programs": "All waivers, AC, Rule 185",
+      "desc": "Your referral to the county of residence asking for a reassessment. Include the type of assessment, attached documents, current program, guardian, scheduling contact and your contact information. Ramsey County asks case managers to send it between the 120th and 150th day before the service agreement ends, include their NPI number, and use the county's email subject-line format.",
+      "more": "DHS-291132",
+      "related": [
+        "DHS-6791F",
+        "DHS-8691",
+        "DHS-7096"
+      ]
+    },
+    {
+      "num": "DHS-6791F",
+      "title": "Instructions for the MnCHOICES Reassessment Communication Form",
+      "category": "Reassessment referrals",
+      "who": "Reference",
+      "programs": "All waivers, AC, Rule 185",
+      "desc": "Line-by-line instructions for filling out DHS-6791E.",
+      "more": "ID_002207"
+    },
+    {
+      "num": "DHS-8691",
+      "title": "65th Birthday Checklist",
+      "category": "Reassessment referrals",
+      "who": "Case manager completes",
+      "programs": "People turning 65",
+      "desc": "Attach to the DHS-6791E when requesting a 65th birthday assessment. Ramsey County's September 2026 bulletin notes DHS changed the 65th birthday assessment process as of 8/1/26.",
+      "more": "DHS-291132"
+    },
+    {
+      "num": "DHS-7096",
+      "title": "MnCHOICES Primary Medical Provider's Documentation of Medical Monitoring and Treatment Needs",
+      "category": "Reassessment referrals",
+      "who": "Case manager gathers",
+      "programs": "CAC",
+      "desc": "Completed by the person's primary medical provider to document medical monitoring and treatment needs for CAC. Ramsey County asks that CAC reassessment referrals include it; it's attached to the person's record in MnCHOICES when applicable.",
+      "more": "ID_000854"
+    },
+    {
+      "num": "DHS-3848",
+      "title": "Related Conditions Checklist",
+      "category": "Reassessment referrals",
+      "who": "Case manager gathers",
+      "programs": "DD, when applicable",
+      "desc": "Documents a related condition for DD eligibility. Used with MnCHOICES for DD when applicable and attached to the person record. See the instructions, DHS-3848A.",
+      "more": "id_000811",
+      "related": [
+        "DHS-3848A"
+      ]
+    },
+    {
+      "num": "DHS-6791D",
+      "title": "MnCHOICES Coordinated Services and Supports Plan Signature Sheet",
+      "category": "Support planning",
+      "who": "Case manager completes",
+      "programs": "All waivers, AC, Rule 185",
+      "desc": "The person signs to confirm they took part in developing their plan, were given choices, and received privacy and appeal-rights information. It also has a section for Rule 185 DD case management recipients who choose to waive their annual MnCHOICES reassessment.",
+      "more": "DHS16_176045"
+    },
+    {
+      "num": "DHS-3751",
+      "title": "Individual Community Living Support (ICLS) Planning Form",
+      "category": "Support planning",
+      "who": "Case manager completes",
+      "programs": "AC, EW",
+      "desc": "Planning form for ICLS services, completed by the case manager or care coordinator and attached to the person record in MnCHOICES.",
+      "more": "DHS-293369"
+    },
+    {
+      "num": "DHS-3936",
+      "title": "My Move Plan Summary",
+      "category": "Support planning",
+      "who": "Case manager completes",
+      "programs": "All waivers",
+      "desc": "Developed with the person when they are moving, when required, to summarize the plan for the move.",
+      "more": "DHS-312487"
+    },
+    {
+      "num": "DHS-6803A",
+      "title": "I Know Me: Creating the Best Home for Me",
+      "category": "Support planning",
+      "who": "Case manager completes",
+      "programs": "BI, CAC, CADI, DD",
+      "desc": "Person-centered tool used with the person to explore what matters to them in a home, as applicable.",
+      "more": "DHS-299403"
+    },
+    {
+      "num": "DHS-7176H",
+      "title": "HCBS Rights Modification Support Plan Attachment",
+      "who": "Case manager completes",
+      "programs": "All waivers",
+      "desc": "Attachment to the person's support plan that documents any modification of their HCBS rights, such as a restriction in a 245D-licensed service, and the reason for it.",
+      "more": "DHS16_176045",
+      "category": "Support planning"
+    },
+    {
+      "num": "DHS-6532",
+      "title": "CDCS Community Support Plan",
+      "who": "Case manager reviews",
+      "programs": "CDCS (Rule 185 compliant)",
+      "desc": "The person's CDCS plan. The case manager reviews and approves it. See also DHS-6633 for budget exceptions.",
+      "more": "id_000855",
+      "related": [
+        "DHS-6633"
+      ],
+      "category": "Support planning"
+    },
+    {
+      "num": "DHS-6789",
+      "title": "Monitoring Technology Approval Request (DHS-6789A, B and C)",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "The approval request process for using monitoring technology in a person's services. DHS-6789 lists the three forms in the process.",
+      "more": "dhs16_180346",
+      "category": "Support planning"
+    },
+    {
+      "num": "DHS-6893W",
+      "title": "Lead Agency Addendum to CFSS Individual Service Delivery Plan",
+      "category": "CFSS",
+      "who": "Case manager completes",
+      "programs": "CFSS (including waiver/AC)",
+      "desc": "Completed and signed by the lead agency after it approves the person's CFSS service delivery plan (DHS-6893P). It tells the person the plan's start and end dates, which match the service agreement, and the final approved units or dollar amounts. Upload it with the DHS-6893P to MnCHOICES, send copies to the person, their CFSS provider agency and/or FMS provider, and adjust the service agreement to match if needed. Case management aides can't approve the plan.",
+      "more": "DHS16_176048",
+      "related": [
+        "DHS-6893P",
+        "DHS-6893L"
+      ]
+    },
+    {
+      "num": "DHS-6893P",
+      "title": "CFSS Individual Service Delivery Plan",
+      "category": "CFSS",
+      "who": "Case manager reviews",
+      "programs": "CFSS (including waiver/AC)",
+      "desc": "The person's CFSS plan, developed with their consultation services provider. The lead agency reviews it to make sure it meets requirements and includes only covered goods and services, then approves it with the DHS-6893W. For someone on a waiver or AC, confirm the changes fit within their CDCS and/or AC/EW budget.",
+      "more": "DHS16_176048",
+      "related": [
+        "DHS-6893W"
+      ]
+    },
+    {
+      "num": "DHS-6893L",
+      "title": "Temporary CFSS Individual Service Delivery Plan Approval",
+      "category": "CFSS",
+      "who": "Case manager completes",
+      "programs": "CFSS (including waiver/AC)",
+      "desc": "Used to avoid a gap in services when a new CFSS service delivery plan isn't approved by the end of the current authorization. Send it to the person and all of their CFSS providers.",
+      "more": "DHS16_176048",
+      "related": [
+        "DHS-6893W"
+      ]
+    },
+    {
+      "num": "DHS-6893M",
+      "title": "CFSS Assessment for 45-Day Increase",
+      "category": "CFSS",
+      "who": "Lead agency completes",
+      "programs": "PCA/CFSS",
+      "desc": "Used by the lead agency to complete assessments for a 45-day temporary increase in PCA/CFSS services.",
+      "more": "DHS16_176048"
+    },
+    {
+      "num": "DHS-5181",
+      "title": "LTC: Communication of LTSS Eligibility Form",
+      "category": "Eligibility and financial",
+      "who": "Case manager completes",
+      "programs": "All waivers, AC, nursing facility admits",
+      "desc": "The form case managers and county financial workers use to communicate about a person's long-term care eligibility (for example, when waiver services open, change or close, or before a nursing facility admission).",
+      "more": "id_000805"
+    },
+    {
+      "num": "DHS-2630",
+      "title": "AC Program Eligibility Worksheet",
+      "category": "Eligibility and financial",
+      "who": "Lead agency completes",
+      "programs": "AC",
+      "desc": "Worksheet for determining financial eligibility for Alternative Care. Attached in MnCHOICES. DHS-2630A is the Type A version.",
+      "more": "id_000853",
+      "related": [
+        "DHS-2630A"
+      ]
+    },
+    {
+      "num": "DHS-6683",
+      "title": "Essential Community Supports (ECS) Financial Eligibility Worksheet",
+      "category": "Eligibility and financial",
+      "who": "Lead agency completes",
+      "programs": "ECS",
+      "desc": "Worksheet for determining financial eligibility for ECS. Attached in MnCHOICES. DHS-6683A covers a married person when only one spouse requests services.",
+      "more": "dhs16_176053",
+      "related": [
+        "DHS-6683A"
+      ]
+    },
+    {
+      "num": "DHS-2140",
+      "title": "Application for Social Services",
+      "category": "Eligibility and financial",
+      "who": "Case manager gathers",
+      "programs": "Rule 185",
+      "desc": "Used (or a lead-agency-developed equivalent) to apply for Rule 185 case management.",
+      "more": "id_000818"
+    },
+    {
+      "num": "DHS-2828A",
+      "title": "LTSS Notice of Action (Assessments and Reassessments)",
+      "category": "Notices and appeals",
+      "who": "Case manager completes",
+      "programs": "All waivers, AC, ECS",
+      "desc": "Written notice about an assessment or reassessment decision, including the person's appeal rights. Check CBSM - Notice of action for when it's required.",
+      "more": "dhs-295973"
+    },
+    {
+      "num": "DHS-2828B",
+      "title": "LTSS Notice of Action – Explanation of Changes to Your Support Plan",
+      "category": "Notices and appeals",
+      "who": "Case manager completes",
+      "programs": "All waivers, AC, ECS",
+      "desc": "Written notice when services in the plan are denied, reduced, suspended or terminated, including appeal rights. Attached in MnCHOICES. Check CBSM - Notice of action for when it's required.",
+      "more": "dhs-295973"
+    },
+    {
+      "num": "DHS-1941",
+      "title": "Your Appeal Rights",
+      "category": "Notices and appeals",
+      "who": "Give to the person",
+      "programs": "All",
+      "desc": "Explains how to appeal. Given with notices of action (or a lead-agency-developed equivalent).",
+      "more": "id_000895"
+    },
+    {
+      "num": "DHS-0033",
+      "title": "Appeal to State Agency",
+      "category": "Notices and appeals",
+      "who": "Give to the person",
+      "programs": "All",
+      "desc": "Form a person can use to file an appeal with DHS.",
+      "more": "id_000895"
+    },
+    {
+      "num": "DHS-3956",
+      "title": "EW Conversion Rate Request",
+      "category": "Budgets, rates and exceptions",
+      "who": "Case manager completes",
+      "programs": "EW",
+      "desc": "Request for an EW conversion rate, as applicable. Attached in MnCHOICES.",
+      "more": "DHS-316213"
+    },
+    {
+      "num": "DHS-8243",
+      "title": "AC/EW PCA/CFSS Enhanced Rate Budget Exception Request",
+      "category": "Budgets, rates and exceptions",
+      "who": "Case manager completes",
+      "programs": "AC, EW",
+      "desc": "Request for a budget exception tied to the PCA/CFSS enhanced rate, as applicable. Attached in MnCHOICES.",
+      "more": "DHS-327995"
+    },
+    {
+      "num": "DHS-4929",
+      "title": "Caregiver Living Expenses Worksheet",
+      "category": "Budgets, rates and exceptions",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "Worksheet for the caregiver living expenses service.",
+      "more": "id_002430"
+    },
+    {
+      "num": "DHS-5887",
+      "title": "Additional Square Footage Approval Request",
+      "category": "Budgets, rates and exceptions",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "Approval request for environmental accessibility adaptations that add square footage.",
+      "more": "dhs16_145944"
+    },
+    {
+      "num": "DHS-5820",
+      "title": "Disability Waiver Rates System Exception Request",
+      "who": "Case manager completes",
+      "programs": "BI, CAC, CADI, DD",
+      "desc": "Request for an exception to a rate calculated by the Disability Waiver Rate System (DWRS). Instructions are in DHS-5820A.",
+      "more": "id_027977",
+      "related": [
+        "DHS-5820A"
+      ],
+      "category": "Budgets, rates and exceptions"
+    },
+    {
+      "num": "DHS-6633",
+      "title": "Exception to CDCS Budget Methodology",
+      "who": "Case manager completes",
+      "programs": "CDCS",
+      "desc": "Request for an exception to the standard CDCS budget methodology.",
+      "more": "id_027977",
+      "category": "Budgets, rates and exceptions"
+    },
+    {
+      "num": "DHS-5504B",
+      "title": "Exception Request for Environmental Accessibility Adaptations that Exceed $40,000",
+      "who": "Case manager completes",
+      "programs": "BI, CAC, CADI, DD",
+      "desc": "Exception request when environmental accessibility adaptations (home or vehicle modifications) will cost more than $40,000. Use the checklist, DHS-5504C, with it.",
+      "more": "id_002196",
+      "related": [
+        "DHS-5504C"
+      ],
+      "category": "Budgets, rates and exceptions"
+    },
+    {
+      "num": "DHS-7759A",
+      "title": "Remote Support Exception Form",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "Exception request related to remote support. DHS publishes this one as an online form rather than a PDF.",
+      "url": "https://survey.dhs.state.mn.us/s/remote-support-exception-7759A",
+      "category": "Budgets, rates and exceptions"
+    },
+    {
+      "num": "DHS-7759B",
+      "title": "Customized Living Size-Limit Exception Request Form",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "Exception request related to the size limit for customized living settings.",
+      "category": "Budgets, rates and exceptions"
+    },
+    {
+      "num": "DHS-3427",
+      "title": "LTC Screening Document – AC, BI, CAC, CADI, ECS, EW, MHM, MSC+, MSHO, SNBC",
+      "who": "Case manager completes",
+      "programs": "AC, BI, CAC, CADI, ECS, EW",
+      "desc": "Built into MnCHOICES for assessments. Use this form for updates outside of MnCHOICES, such as administrative changes not related to an assessment. Instructions are in DHS-4625.",
+      "more": "ID_002207",
+      "related": [
+        "DHS-4625"
+      ],
+      "category": "Screening documents"
+    },
+    {
+      "num": "DHS-3067",
+      "title": "DD Screening Document",
+      "who": "Case manager completes",
+      "programs": "DD, Rule 185",
+      "desc": "Built into MnCHOICES for assessments. Use this form for administrative changes made outside of MnCHOICES.",
+      "more": "ID_002207",
+      "category": "Screening documents"
+    },
+    {
+      "num": "DHS-6037",
+      "title": "MnCHOICES Lead Agency Transfer and Communication Form",
+      "category": "Transfers",
+      "who": "Case manager completes",
+      "programs": "All",
+      "desc": "Used to transfer a case or communicate between lead agencies, for example when a person moves to another county.",
+      "more": "dhs-295304"
+    },
+    {
+      "num": "DHS-3195",
+      "title": "Interagency Case Transfer Form",
+      "category": "Transfers",
+      "who": "Case manager completes",
+      "programs": "All",
+      "desc": "General form for transferring a case between agencies.",
+      "more": "id_000675"
+    },
+    {
+      "num": "DHS-7418",
+      "title": "Host County Notification of Residential Placement Form",
+      "who": "Case manager completes",
+      "programs": "Waivers",
+      "desc": "Notifies the host county when a person moves into a residential setting in that county.",
+      "more": "DHS-294584",
+      "category": "Transfers"
+    },
+    {
+      "num": "DHS-5841",
+      "title": "MCO/County/Tribal Agency Communication Form – Recommendation for State Plan Home Care Services",
+      "category": "Home care",
+      "who": "Case manager completes",
+      "programs": "MSHO, MSC+, SNBC, Families and Children only",
+      "desc": "Recommendation for state plan home care services for people on those managed care programs.",
+      "more": "dhs16_176046"
+    },
+    {
+      "num": "DHS-4839E",
+      "title": "Notice of Privacy Practices and Notice of Rights and Responsibilities",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "All",
+      "desc": "Privacy and rights information given to the person (or a lead-agency-developed equivalent). The CSSP signature sheet asks the person to confirm they received it.",
+      "more": "id_000672"
+    },
+    {
+      "num": "DHS-6778E",
+      "title": "Minnesota Abuse Reporting Center Brochure",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "Required for DD Waiver assessments; others as applicable",
+      "desc": "Explains how to report suspected maltreatment of a vulnerable adult.",
+      "more": "id_027646"
+    },
+    {
+      "num": "DHS-6791K",
+      "title": "About the MnCHOICES documents you are receiving",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "All",
+      "desc": "Explains the MnCHOICES assessment and support plan documents the person receives.",
+      "more": "dhs16_176044"
+    },
+    {
+      "num": "DHS-5186",
+      "title": "AC Program Estate Recovery Information",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "AC",
+      "desc": "Explains estate recovery for Alternative Care. Ramsey County's September 2026 bulletin asks lead agencies to share it with people on AC.",
+      "more": "DHS-319241"
+    },
+    {
+      "num": "DHS-4639",
+      "title": "AC Program Monthly Fee and Payment Information",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "AC",
+      "desc": "Explains AC monthly fees and payments. Useful when following up on the AC Overdue Fee Report.",
+      "more": "DHS-319241"
+    },
+    {
+      "num": "DHS-6893U",
+      "title": "Information for People Who Use CFSS",
+      "category": "Give to the person",
+      "who": "Give to the person",
+      "programs": "CFSS",
+      "desc": "Plain-language information about CFSS for the person and their family.",
+      "more": "DHS16_176048"
+    }
+  ]
+}
