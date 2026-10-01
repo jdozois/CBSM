@@ -44,6 +44,7 @@ aside.toc li{margin:1px 0}
 aside.toc .item{display:flex;align-items:flex-start}
 aside.toc .tw{all:unset;cursor:pointer;width:18px;flex:none;text-align:center;color:var(--muted);line-height:1.9}
 aside.toc .tw:focus-visible{outline:2px solid var(--focus)}
+aside.toc a[target="_blank"]::after{content:" ↗";font-size:.8em;opacity:.6}
 aside.toc a{flex:1;display:block;padding:3px 8px;border-radius:6px;text-decoration:none;color:var(--ink);line-height:1.4}
 aside.toc a:hover{background:var(--pine-soft)}
 aside.toc a[aria-current="page"]{background:var(--pine);color:var(--panel);font-weight:700}
@@ -93,6 +94,32 @@ h2.bh{font-size:20px;margin:0 0 10px}
 .plain a{font-weight:700;text-decoration:none}
 .muted{color:var(--muted)}
 .change h3{font-size:17px;margin:22px 0 6px}
+.blist{list-style:none;margin:0 0 30px;padding:0;border-top:1px solid var(--line)}
+.blist li{border-bottom:1px solid var(--line);padding:12px 4px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.blist .d{color:var(--muted);font-size:14px;min-width:92px}
+.blist a{font-weight:700;text-decoration:none}
+.doc div{margin:.35em 0}
+.bulletin-note{font-size:14px;color:var(--muted);margin:0 0 20px}
+.ftools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:inherit;font-size:15px;border:0;background:var(--panel);color:var(--ink);padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pine);color:var(--panel);font-weight:700}
+.ffilter{flex:1;min-width:200px;font:inherit;font-size:16px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink)}
+.fcat{font-size:19px;margin:28px 0 8px;color:var(--lake)}
+.flist{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.form{border-bottom:1px solid var(--line);padding:14px 6px}
+.form.hit{background:var(--sun-soft);border-radius:8px}
+.fhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.fnum{font-weight:700;color:var(--pine);white-space:nowrap}
+.ftitle{font-weight:700;font-size:17px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.badge{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:1px 9px;color:var(--muted);background:var(--panel)}
+.badge.who{border-color:var(--pine);color:var(--pine)}
+.badge.rev{border-color:var(--sun);background:var(--sun-soft);color:var(--ink);font-weight:700}
+.fdesc{margin:4px 0 6px;max-width:78ch}
+.factions{display:flex;gap:16px;flex-wrap:wrap;font-size:15px}
+.fmention{font-size:14px;color:var(--muted);margin-top:4px}
+.fmention a{color:var(--muted)}
 .change .k{display:inline-block;min-width:74px;font-size:14px;color:var(--muted)}
 .notice{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--sun);padding:12px 16px;border-radius:0 10px 10px 0;margin:0 0 24px;font-size:15px}
 footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-size:14px;color:var(--muted);max-width:74ch}
@@ -122,7 +149,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-si
       <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search every page — “CADI budget”, “reassessment”, “EVV”">
       <kbd>/</kbd>
     </div>
-    <nav aria-label="Site"><a href="#/changes" id="navChanges">What changed</a></nav>
+    <nav aria-label="Site"><a href="#/forms" id="navForms">Forms</a><a href="#/bulletins" id="navBulletins">Bulletins</a><a href="#/changes" id="navChanges">What changed</a></nav>
   </div>
 </header>
 
@@ -141,18 +168,22 @@ const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&");
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let pins=store.get("cbsm-pins",[]),recent=store.get("cbsm-recent",[]),openNodes=new Set(store.get("cbsm-open",[]));
 
-let TOC=[],META={},SEARCH=null,searchLoading=null,titles={},parents={};
+let TOC=[],META={},SEARCH=null,searchLoading=null,titles={},parents={},BULLETINS=[],FORMS=[],SRC={};
+const DHS_BASE="https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=";
+const linksMode=()=>META.mode==="links";
+const officialUrl=id=>(META.official_base||DHS_BASE)+encodeURIComponent(SRC[id]||id);
+const isCbsm=id=>!id.startsWith("B-")&&!id.startsWith("F-");
 const pageCache=new Map();
 
 async function j(url){const r=await fetch(url,{cache:"no-cache"});if(!r.ok)throw new Error(r.status);return r.json()}
 
 // ---------- table of contents
-function indexToc(nodes,parent){for(const n of nodes){titles[n.id]=n.title;if(parent)parents[n.id]=parent;indexToc(n.children||[],n.id)}}
+function indexToc(nodes,parent){for(const n of nodes){titles[n.id]=n.title;if(n.src)SRC[n.id]=n.src;if(parent)parents[n.id]=parent;indexToc(n.children||[],n.id)}}
 function tocHtml(nodes){
   return "<ul>"+nodes.map(n=>{
     const kids=n.children&&n.children.length;
     const open=openNodes.has(n.id);
-    return `<li class="${kids&&!open?"closed":""}" data-id="${n.id}"><div class="item">${kids?`<button class="tw" aria-expanded="${open}" aria-label="${open?"Collapse":"Expand"} ${esc(n.title)}">${open?"▾":"▸"}</button>`:`<span class="tw" aria-hidden="true"></span>`}<a href="#/page/${n.id}">${esc(n.title)}</a></div>${kids?tocHtml(n.children):""}</li>`}).join("")+"</ul>";
+    return `<li class="${kids&&!open?"closed":""}" data-id="${n.id}"><div class="item">${kids?`<button class="tw" aria-expanded="${open}" aria-label="${open?"Collapse":"Expand"} ${esc(n.title)}">${open?"▾":"▸"}</button>`:`<span class="tw" aria-hidden="true"></span>`}${linksMode()?`<a href="${officialUrl(n.id)}" target="_blank" rel="noopener">${esc(n.title)}</a>`:`<a href="#/page/${n.id}">${esc(n.title)}</a>`}</div>${kids?tocHtml(n.children):""}</li>`}).join("")+"</ul>";
 }
 function renderToc(){$("#toc").innerHTML=tocHtml(TOC)}
 function markToc(id){
@@ -219,15 +250,95 @@ async function showSearch(q){
   active=0;
   main.innerHTML=`${dec.length?`<div class="decoder">${dec.map(a=>`<span><b>${esc(a)}</b> means ${esc(ACRO[a])}</span>`).join("")}</div>`:""}
     <h1 class="pt">${results.length?`${results.length}${results.length===80?"+":""} page${results.length===1?" mentions":"s mention"} “${esc(q)}”`:`Nothing mentions “${esc(q)}”`}</h1>
-    ${results.length?`<p class="muted">Searching the full text of every page.<span class="kb"> ↑ ↓ to move, Enter to open.</span></p>
-    <ul class="results" id="results">${results.map((r,i)=>`<li class="${i===0?"active":""}"><a class="t" href="#/page/${r.d.id}?hl=${encodeURIComponent(q)}">${hl(esc(r.d.t),terms)}</a>${r.d.p?`<div class="p">${esc(r.d.p)}</div>`:""}<div class="s">${snippet(r.d,terms)}</div></li>`).join("")}</ul>`
+    ${results.length?`<p class="muted">${linksMode()?"Searching CBSM page titles, bulletins and forms. CBSM pages open on the DHS site.":"Searching the full text of every page."}<span class="kb"> ↑ ↓ to move, Enter to open.</span></p>
+    <ul class="results" id="results">${results.map((r,i)=>`<li class="${i===0?"active":""}"><a class="t" ${linksMode()&&isCbsm(r.d.id)?`href="${officialUrl(r.d.id)}" target="_blank" rel="noopener"`:`href="${r.d.id.startsWith("F-")?linkFor(r.d.id):linkFor(r.d.id)+"?hl="+encodeURIComponent(q)}"`}>${hl(esc(r.d.t),terms)}</a>${r.d.p?`<div class="p">${esc(r.d.p)}</div>`:""}<div class="s">${snippet(r.d,terms)}</div></li>`).join("")}</ul>`
     :`<p>Try fewer words, a program name (CADI, EW, PCA), or a task such as “reassessment” or “appeal”.</p>`}`;
 }
 function moveActive(d){const rows=[...document.querySelectorAll("#results li")];if(!rows.length)return;
   active=Math.max(0,Math.min(rows.length-1,active+d));rows.forEach((r,i)=>r.classList.toggle("active",i===active));rows[active].scrollIntoView({block:"nearest"})}
 
+function linkFor(id){return id.startsWith("B-")?"#/bulletin/"+id.slice(2):id.startsWith("F-")?"#/forms?f="+id.slice(2):"#/page/"+id}
+
+// ---------- bulletins
+function fmtDay(iso){if(!iso)return"";const [y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}
+function showBulletins(){
+  document.title="Ramsey County ADS bulletins — CBSM";markToc("");
+  $("#main").innerHTML=`<h1 class="pt">Ramsey County ADS bulletins</h1>
+    <p class="muted">ADS Case Management Bulletins from Ramsey County Aging and Disability Services, collected daily. Search at the top covers these too.</p>
+    ${BULLETINS.length?`<ul class="blist">${BULLETINS.map(b=>`<li><span class="d">${fmtDay(b.sent)}</span><a href="#/bulletin/${esc(b.id)}">${esc(b.title)}</a></li>`).join("")}</ul>`
+    :`<div class="notice">No bulletins collected yet. They'll appear after the next daily sync.</div>`}`;
+}
+async function showBulletin(id,hlq){
+  markToc("");
+  const main=$("#main");main.innerHTML=`<p class="muted">Loading…</p>`;
+  let b;try{b=await j(`data/bulletins/${encodeURIComponent(id)}.json`)}
+  catch(e){main.innerHTML=`<h1 class="pt">This bulletin isn't on the site</h1><p><a href="#/bulletins">See all bulletins</a></p>`;return}
+  document.title=b.title+" — CBSM";
+  let body=b.html;
+  if(hlq){const terms=hlq.toLowerCase().split(/\s+/).flatMap(w=>{const a=ACRO[w.toUpperCase()];return a?[w,a]:[w]});body=hl(body,terms)}
+  main.innerHTML=`<div class="crumbs"><a href="#/bulletins">Ramsey County ADS bulletins</a></div>
+    <h1 class="pt">${esc(b.title)}</h1>
+    <div class="pagemeta">${b.sent?`<span>Sent ${fmtDay(b.sent)}</span>`:""}<a href="${esc(b.url)}" target="_blank" rel="noopener">Original bulletin</a></div>
+    <p class="bulletin-note">Copied from Ramsey County's bulletin. Attachments and meeting links open the county's originals.</p>
+    <article class="doc" id="doc">${body}</article>`;
+  const m=document.querySelector("#doc mark");if(m)m.scrollIntoView({block:"center"});else window.scrollTo(0,0);
+}
+
+// ---------- forms
+let formView="cm";
+function isRecent(iso,days){return iso&&(Date.now()-new Date(iso).getTime())<days*864e5}
+function formCard(f,hit){
+  const mentions=(f.mentions||[]).slice(0,5);
+  const rel=(f.related||[]).filter(n=>FORMS.some(x=>x.num===n));
+  return `<li class="form${hit?" hit":""}" id="form-${esc(f.num)}">
+    <div class="fhead"><span class="fnum">${esc(f.num)}</span><span class="ftitle">${esc(f.title===f.num?"":f.title)}</span></div>
+    <div class="badges">${f.who?`<span class="badge who">${esc(f.who)}</span>`:""}${f.programs?`<span class="badge">${esc(f.programs)}</span>`:""}${isRecent(f.revised,90)?`<span class="badge rev">Revised ${fmtDate(f.revised)}</span>`:""}</div>
+    ${f.desc?`<p class="fdesc">${esc(f.desc)}</p>`:""}
+    <div class="factions"><a href="${esc(f.url)}" target="_blank" rel="noopener"><b>Open current form ↗</b></a>${f.more?`<a href="#/page/${esc(f.more.toUpperCase())}">CBSM background</a>`:""}${rel.map(n=>`<a href="#/forms?f=${esc(n)}">${esc(n)}</a>`).join("")}</div>
+    ${mentions.length?`<div class="fmention">Mentioned in: ${mentions.map(m=>`<a href="${linkFor(m.id)}">${esc(titles[m.id]||m.title||m.id)}</a>`).join(", ")}</div>`:""}
+  </li>`;
+}
+function renderForms(focus){
+  const q=($("#ffilter")?.value||"").toLowerCase().trim();
+  const pool=FORMS.filter(f=>formView==="all"||f.cm);
+  const match=f=>!q||[f.num,f.title,f.desc,f.programs,f.who,f.category].join(" ").toLowerCase().includes(q);
+  const list=pool.filter(match);
+  let html="";
+  if(formView==="cm"){
+    const cats=[...new Set(list.map(f=>f.category||"Other"))];
+    html=cats.map(c=>`<h2 class="fcat">${esc(c)}</h2><ul class="flist">${list.filter(f=>(f.category||"Other")===c).map(f=>formCard(f,f.num===focus)).join("")}</ul>`).join("");
+  }else{
+    html=`<ul class="flist">${list.slice().sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true})).map(f=>formCard(f,f.num===focus)).join("")}</ul>`;
+  }
+  $("#formsOut").innerHTML=list.length?html:`<p class="muted">No forms match “${esc(q)}”.</p>`;
+  if(focus){const el=document.getElementById("form-"+focus);if(el)el.scrollIntoView({block:"center"})}
+}
+function showForms(focus){
+  document.title="DHS forms — CBSM";markToc("");
+  if(focus&&!FORMS.some(f=>f.num===focus&&f.cm))formView="all";
+  const cmCount=FORMS.filter(f=>f.cm).length;
+  $("#main").innerHTML=`<h1 class="pt">DHS forms</h1>
+    <p class="muted">Links always open the current version on DHS eDocs. The daily sync checks these forms and marks any DHS has revised.</p>
+    ${FORMS.length?`<div class="ftools"><div class="seg" role="group" aria-label="Which forms">
+      <button id="fvCm" aria-pressed="${formView==="cm"}">Case manager forms (${cmCount})</button>
+      <button id="fvAll" aria-pressed="${formView==="all"}">All forms (${FORMS.length})</button></div>
+      <input class="ffilter" id="ffilter" type="search" placeholder="Filter by number, name or program" aria-label="Filter forms"></div>
+      <div id="formsOut"></div>`:`<div class="notice">The forms list appears after the next daily sync.</div>`}`;
+  if(!FORMS.length)return;
+  $("#fvCm").onclick=()=>{formView="cm";showForms()};
+  $("#fvAll").onclick=()=>{formView="all";showForms()};
+  $("#ffilter").oninput=()=>renderForms();
+  renderForms(focus);
+  if(!focus)window.scrollTo(0,0);
+}
+
 // ---------- page view
 async function showPage(id,anchor,hlq){
+  if(id.startsWith("B-"))return showBulletin(id.slice(2),hlq);
+  if(linksMode()){
+    $("#main").innerHTML=`<h1 class="pt">Opening ${esc(titles[id]||"the CBSM page")} on the DHS site…</h1><p><a href="${officialUrl(id)}">Open it now</a></p>`;
+    location.replace(officialUrl(id));return;
+  }
   const main=$("#main");
   markToc(id);
   let p=pageCache.get(id);
@@ -267,7 +378,7 @@ async function showPage(id,anchor,hlq){
 
 // ---------- home & changes
 function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}
-function listOf(ids){return `<ul class="plain">${ids.map(id=>`<li><a href="#/page/${id}">${esc(titles[id]||id)}</a></li>`).join("")}</ul>`}
+function listOf(ids){return `<ul class="plain">${ids.map(id=>`<li><a href="${linkFor(id)}">${esc(titles[id]||id)}</a></li>`).join("")}</ul>`}
 async function showHome(){
   document.title="CBSM";
   const pinned=pins.filter(id=>titles[id]),rec=recent.filter(id=>titles[id]&&!pins.includes(id)).slice(0,6);
@@ -275,20 +386,22 @@ async function showHome(){
   const last=changes[0];
   $("#main").innerHTML=`
     <h1 class="pt">Community-Based Services Manual</h1>
-    <p class="muted" style="margin-top:-4px">${META.pages||"All"} pages mirrored from Minnesota DHS, last synced ${fmtDate(META.synced)}. Press / to search every page.</p>
+    <p class="muted" style="margin-top:-4px">${linksMode()?`Quick links to all ${META.pages||""} CBSM pages on the DHS site, plus Ramsey County bulletins and DHS forms. Updated ${fmtDate(META.synced)}. Press / to search.`:`${META.pages||"All"} pages mirrored from Minnesota DHS, last synced ${fmtDate(META.synced)}. Press / to search every page.`}</p>
     <h2 class="bh">Which waiver?</h2>
-    <div class="waivers">${WAIVERS.map(w=>`<a href="#/page/${w[3]}"><span class="ab">${w[0]}</span><span class="nm">${w[1]}</span><span class="who">${w[2]}</span></a>`).join("")}</div>
+    <div class="waivers">${WAIVERS.map(w=>`<a ${linksMode()?`href="${officialUrl(w[3])}" target="_blank" rel="noopener"`:`href="#/page/${w[3]}"`}><span class="ab">${w[0]}</span><span class="nm">${w[1]}</span><span class="who">${w[2]}</span></a>`).join("")}</div>
+    ${BULLETINS[0]?`<h2 class="bh">Latest Ramsey County bulletin</h2><ul class="plain"><li><a href="#/bulletin/${esc(BULLETINS[0].id)}">${esc(BULLETINS[0].title)}</a> <span class="muted">sent ${fmtDay(BULLETINS[0].sent)}</span></li></ul>`:""}
+    ${FORMS.some(f=>isRecent(f.revised,30))?`<h2 class="bh">Forms DHS revised this month</h2>${listOf(FORMS.filter(f=>isRecent(f.revised,30)).map(f=>"F-"+f.num))}`:""}
     ${pinned.length?`<h2 class="bh">Pinned</h2>${listOf(pinned)}`:""}
     ${rec.length?`<h2 class="bh">Recently read</h2>${listOf(rec)}`:""}
     ${last?`<h2 class="bh">Latest changes, ${fmtDate(last.date)}</h2>${listOf([...last.added,...last.changed].slice(0,8).map(x=>x.id))}<p><a href="#/changes">See every change</a></p>`:""}
-    <footer>Unofficial mirror of the Minnesota DHS Community-Based Services Manual, re-synced daily. DHS's site is the authority on policy; each page links to its official version.</footer>`;
+    <footer>${linksMode()?"Unofficial guide to the Minnesota DHS Community-Based Services Manual. CBSM links open DHS's official pages.":"Unofficial mirror of the Minnesota DHS Community-Based Services Manual, re-synced daily. DHS's site is the authority on policy; each page links to its official version."}</footer>`;
 }
 async function showChanges(){
   document.title="What changed — CBSM";
   let log=[];try{log=await j("data/changes.json")}catch(e){}
-  const item=(k,arr,link=true)=>arr.map(x=>`<div><span class="k">${k}</span>${link?`<a href="#/page/${x.id}">${esc(x.title)}</a>`:esc(x.title)}</div>`).join("");
+  const item=(k,arr,link=true)=>arr.map(x=>`<div><span class="k">${k}</span>${link?`<a href="${linkFor(x.id)}">${esc(x.title)}</a>`:esc(x.title)}</div>`).join("");
   $("#main").innerHTML=`<h1 class="pt">What changed</h1>
-    <p class="muted">Every daily sync compares each page's text with the day before. A page shows up here when DHS edits its content, adds it, or removes it.</p>
+    <p class="muted">${linksMode()?"New Ramsey County bulletins and DHS form revisions, checked daily. For CBSM policy changes, subscribe to DHS's DSD eLists.":"Every daily sync compares each page's text with the day before. A page shows up here when DHS edits its content, adds it, or removes it."}</p>
     ${log.length?log.map(c=>`<section class="change"><h3>${fmtDate(c.date)}</h3>${item("Added",c.added)}${item("Edited",c.changed)}${item("Removed",c.removed,false)}</section>`).join("")
     :`<div class="notice">No changes recorded yet. The log starts after the second sync.</div>`}`;
 }
@@ -298,7 +411,14 @@ function route(){
   closeMenu();
   const h=location.hash.slice(1)||"/";
   $("#navChanges").toggleAttribute("aria-current",h==="/changes");
+  $("#navBulletins").toggleAttribute("aria-current",h.startsWith("/bulletin"));
   if(h==="/changes")return showChanges();
+  $("#navForms").toggleAttribute("aria-current",h.startsWith("/forms"));
+  if(h==="/bulletins")return showBulletins();
+  let fm=h.match(/^\/forms(?:\?f=(.*))?$/);
+  if(fm)return showForms(fm[1]&&decodeURIComponent(fm[1]));
+  let bm=h.match(/^\/bulletin\/([^/?]+)(?:\?hl=(.*))?$/);
+  if(bm)return showBulletin(decodeURIComponent(bm[1]),bm[2]&&decodeURIComponent(bm[2]));
   let m=h.match(/^\/search\?q=(.*)$/);
   if(m){const q=decodeURIComponent(m[1]);if($("#q").value!==q)$("#q").value=q;return showSearch(q)}
   m=h.match(/^\/page\/([^/?]+)(?:\/([^?]+))?(?:\?hl=(.*))?$/);
@@ -313,7 +433,7 @@ $("#q").addEventListener("focus",loadSearch);
 $("#q").addEventListener("keydown",e=>{
   if(e.key==="ArrowDown"){e.preventDefault();moveActive(1)}
   if(e.key==="ArrowUp"){e.preventDefault();moveActive(-1)}
-  if(e.key==="Enter"){const a=document.querySelectorAll("#results li a.t")[active];if(a){location.hash=a.getAttribute("href");$("#q").blur()}}
+  if(e.key==="Enter"){const a=document.querySelectorAll("#results li a.t")[active];if(a){if(a.target==="_blank")window.open(a.href,"_blank","noopener");else location.hash=a.getAttribute("href");$("#q").blur()}}
   if(e.key==="Escape"){$("#q").value="";location.hash="#/"}
 });
 document.addEventListener("keydown",e=>{if(e.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$("#q").focus();$("#q").select()}});
@@ -324,7 +444,12 @@ window.addEventListener("hashchange",route);
 (async()=>{
   try{[TOC,META]=await Promise.all([j("data/toc.json"),j("data/meta.json")])}
   catch(e){$("#main").innerHTML=`<h1 class="pt">No data yet</h1><p>Run the sync once (see the README) so there's something to show.</p>`;$("#toc").innerHTML="";return}
+  try{BULLETINS=await j("data/bulletins.json")}catch(e){BULLETINS=[]}
+  try{FORMS=await j("data/forms.json")}catch(e){FORMS=[]}
+  FORMS.forEach(f=>titles["F-"+f.num]=f.num+" "+(f.title===f.num?"":f.title));
+  BULLETINS.forEach(b=>titles["B-"+b.id]=b.title);
   indexToc(TOC);
+  if(linksMode())$("#q").placeholder="Search CBSM pages, forms and bulletins — “CADI”, “6791E”, “CFSS”";
   route();
 })();
 </script>
