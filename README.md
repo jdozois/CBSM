@@ -1,6 +1,6 @@
 # CBSM guide
 
-An unofficial quick-reference site for Minnesota DHS's Community-Based Services Manual (CBSM), built for waiver case managers. It's live at https://jdozois.github.io/CBSM/.
+An unofficial quick-reference site for Minnesota DHS's Community-Based Services Manual (CBSM), built for waiver case managers. It's live at https://ramsey-cm-guide.github.io/CBSM/.
 
 ## What the site has
 
